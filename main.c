@@ -1,31 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
 #include <unistd.h>
 #include <time.h>
 #include "main.h"
 
 #define clear() printf("\033[H\033[J")
 
+const int rows = 100;
+const int cols = 100;
+const int lifeChance = 10; // Percentage chance a tile starts the game alive.
+
+int aliveNeighbours;
+int isAlive;
+
 int main(void) {
+
     int state1[rows][cols]; // To be evaluated.
     int state2[rows][cols]; // To be rendered, then assigned to state1.
 
     int i, j;
+    
+    // Seed RNG
+    srand( (__uint32_t)time(0) );
 
-    srand( time(NULL) );
-
-    // Generate initial random canvas.
-    for (i = 0; i < rows; i++) {
+    // Generate initial random canvas, dead is weighted.
+   for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
-            state1[i][j] = rand() % 2;
+            if ((rand() % 100) > lifeChance) {
+                state1[i][j] = 0;
+                continue;
+            }
+            state1[i][j] = 1;
         }
     }
 
     Render(state1, &state2[0][0]);
 
-    while(1) {
+   while(1) {
         system("clear");
         
         // Evaluate state2 based on live cell neighbours.
@@ -52,13 +64,13 @@ int main(void) {
                     state2[i][j] = 1;
                 }
             }
-        }
+        } 
 
         // Print next generation
         Render(state2, &state1[0][0]);
 
-        // sleep for 1s
-        sleep(0.25);
+        // sleep for 0.5ms
+        usleep(500 * 1000);
     }
 
     return 0;
@@ -88,10 +100,10 @@ void Render(int renderState[rows][cols], int* state1Ptr) {
         for (int j = 0; j < cols; j++) {
             isAlive = renderState[i][j];
 
-            if (!isAlive) {
-                printf("0");
+            if (isAlive) {
+                printf("O");
             }
-            printf("1");
+            else printf(" ");
 
             *(state1Ptr + i * cols + j) = renderState[i][j];
         }
