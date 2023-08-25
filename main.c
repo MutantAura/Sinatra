@@ -7,9 +7,8 @@
 
 #define clear() printf("\033[H\033[J")
 
-const int rows = 100;
-const int cols = 100;
-const int lifeChance = 10; // Percentage chance a tile starts the game alive.
+const int lifeChance = 20; // Percentage chance a tile starts the game alive.
+const __useconds_t refreshTime = 250; // Time in ms per cycle refresh. 
 
 int aliveNeighbours;
 int isAlive;
@@ -38,7 +37,7 @@ int main(void) {
     Render(state1, &state2[0][0]);
 
    while(1) {
-        system("clear");
+        clear();
         
         // Evaluate state2 based on live cell neighbours.
         for (i = 0; i < rows; i++) {
@@ -69,8 +68,8 @@ int main(void) {
         // Print next generation
         Render(state2, &state1[0][0]);
 
-        // sleep for 0.5ms
-        usleep(500 * 1000);
+        // sleep for refreshTime
+        usleep(refreshTime * 1000);
     }
 
     return 0;
